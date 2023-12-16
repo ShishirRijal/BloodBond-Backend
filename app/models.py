@@ -12,7 +12,7 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True, index=True)
     password = Column(String, nullable=False)
-    phone = Column(String(10), nullable=False, unique=True, index=True)
+    phone = Column(String(), nullable=False, unique=True, index=True)
     address = Column(String, nullable=False)
     blood_group = Column(String, nullable=False)
     is_donor = Column(Boolean, nullable=False)
