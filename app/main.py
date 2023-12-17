@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from .import models, schemas
 from .database import engine, get_db
-from .utils import get_password_hash
+from .utils import get_password_hash, verify_password
 
 # Create the tables in the database
 models.Base.metadata.create_all(bind=engine)
@@ -18,7 +18,7 @@ def root():
     return {"message": "Welcome to BloodBond!"}
 
 
-@app.post("/api/v1/signup", status_code=status.HTTP_201_CREATED)
+@app.post("/api/v1/signup", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
         user.password = get_password_hash(user.password)
@@ -34,3 +34,22 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     except:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error")
+
+
+@app.post("/api/v1/login", status_code=status.HTTP_200_OK)
+def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    # check if user exists
+    db_user = db.query(models.User).filter(
+        models.User.email == user.email).first()
+    # if the user doesn't exist
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user found with this email")
+    # check if the password matches
+    is_password_correct = verify_password(user.password, db_user.password)
+    # if password doesn't match, raise an error
+    if not is_password_correct:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
+    # if password matches, return login successful
+    return {"message": "Login successful"}
