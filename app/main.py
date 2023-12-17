@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from .import models, schemas
 from .database import engine, get_db
+from .utils import get_password_hash
 
 # Create the tables in the database
 models.Base.metadata.create_all(bind=engine)
@@ -20,14 +21,13 @@ def root():
 @app.post("/api/v1/signup", status_code=status.HTTP_201_CREATED)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
-        # TODO: hash the password
+        user.password = get_password_hash(user.password)
         new_user = models.User(**user.model_dump())
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
-        return {"status": "Success", "data": new_user}
+        return new_user
     except (Exception, psycopg2.IntegrityError) as error:
-        print(error)
         # if error.pgcode == errorcodes.UNIQUE_VIOLATION:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=f"User already exists")
