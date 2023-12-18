@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 import psycopg2
-from psycopg2 import errorcodes
 from sqlalchemy.orm import Session
 
 from .import models, schemas
@@ -57,3 +56,25 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
     access_token = oauth2.create_access_token(data={"email": db_user.email})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.post("/api/v1/change-password", status_code=status.HTTP_200_OK)
+def change_password(user: schemas.UserChangePassword, db: Session = Depends(get_db)):
+    print(user)
+    # check if user with provided email exists
+    db_user = db.query(models.User).filter(
+        models.User.email == user.email).first()
+    # if the user doesn't exist, raise an error
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user found with this email")
+    # check if the password matches
+    is_password_correct = verify_password(user.password, db_user.password)
+    # if password doesn't match, raise an error
+    if not is_password_correct:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
+    # if password matches, change the password
+    db_user.password = get_password_hash(user.new_password)
+    db.commit()
+    return {"message": "Password changed successfully!"}

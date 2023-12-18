@@ -1,13 +1,13 @@
 # This file contains the Pydantic models,
 # which are used to define the schema for validation.
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 
 class UserBase(BaseModel):
     name: str
-    email: str
+    email: EmailStr
     phone: str
     address: str
     blood_group: str
@@ -28,8 +28,14 @@ class UserResponse(UserBase):
 
 
 class UserLogin(BaseModel):
-    email: str
+    email: EmailStr
     password: str
+
+
+class UserChangePassword(BaseModel):
+    email: EmailStr
+    password: str
+    new_password: str
 
 
 class Token(BaseModel):
@@ -38,4 +44,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    email: str | None = None
+    email: EmailStr | None = None
