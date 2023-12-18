@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from .import models, schemas
 from .database import engine, get_db
 from .utils import get_password_hash, verify_password
+from . import oauth2
+
 
 # Create the tables in the database
 models.Base.metadata.create_all(bind=engine)
@@ -36,7 +38,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error")
 
 
-@app.post("/api/v1/login", status_code=status.HTTP_200_OK)
+@app.post("/api/v1/login", status_code=status.HTTP_200_OK, response_model=schemas.Token)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     # check if user exists
     db_user = db.query(models.User).filter(
@@ -52,4 +54,6 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     # if password matches, return login successful
-    return {"message": "Login successful"}
+
+    access_token = oauth2.create_access_token(data={"email": db_user.email})
+    return {"access_token": access_token, "token_type": "bearer"}
