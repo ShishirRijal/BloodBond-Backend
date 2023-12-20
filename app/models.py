@@ -19,3 +19,14 @@ class User(Base):
     is_male = Column(Boolean, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text('NOW()'))
+
+
+class PasswordResetTokens(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, nullable=False, index=True)
+    otp = Column(String, nullable=False, unique=True, index=True)
+    # expiry time = 5 minutes
+    expiry_time = Column(TIMESTAMP(timezone=True), nullable=False,
+                         server_default=text('NOW() + INTERVAL \'5 minutes\''))
