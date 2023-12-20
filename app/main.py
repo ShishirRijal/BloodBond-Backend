@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 import psycopg2
 from sqlalchemy.orm import Session
+import smtplib
 
 from .import models, schemas
 from .database import engine, get_db
-from .utils import get_password_hash, verify_password
+from .utils import get_password_hash, verify_password, send_mail, generate_otp
 from . import oauth2
 
 
@@ -78,3 +79,37 @@ def change_password(user: schemas.UserChangePassword, db: Session = Depends(get_
     db_user.password = get_password_hash(user.new_password)
     db.commit()
     return {"message": "Password changed successfully!"}
+
+
+@app.post("/api/v1/forgot-password")
+def forgot_password(user: schemas.UserForgotPassword, db: Session = Depends(get_db)):
+    # check if user with provided email exists
+    db_user = db.query(models.User).filter(
+        models.User.email == user.email).first()
+    # if the user doesn't exist, raise an error
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No user found with this email")
+    # if user exists, send the email
+    try:
+        # generate otp
+        otp = generate_otp()
+        send_mail(to=user.email,
+                  subject="BloodBond Password Reset Request",
+                  body=f"""
+Dear {db_user.name},
+
+You've requested to reset your BloodBond password. Here's your one-time password:
+
+{otp}
+
+Use this code to reset your password within the next 10 minutes. If you didn't make this request, please ignore this message.
+
+Stay secure,
+BloodBond Team                       
+                """)
+        return {"message": "Email sent successfully!"}
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")

@@ -38,6 +38,10 @@ class UserChangePassword(BaseModel):
     new_password: str
 
 
+class UserForgotPassword(BaseModel):
+    email: EmailStr
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
