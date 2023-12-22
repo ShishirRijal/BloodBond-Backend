@@ -5,7 +5,7 @@ import smtplib
 
 from .import models, schemas
 from .database import engine, get_db
-from .utils import get_password_hash, verify_password, send_mail, generate_otp
+from .utils import get_password_hash, verify_password, send_mail, generate_otp, verify_user_otp
 from . import oauth2
 
 
@@ -113,3 +113,24 @@ BloodBond Team
         print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+
+
+@app.post("/api/v1/verify-otp", status_code=status.HTTP_200_OK)
+def verify_otp(cred: schemas.UserOtpVerify, db: Session = Depends(get_db)):
+    result = verify_user_otp(cred.email, cred.otp, db)
+    if result is False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid otp!")
+    return {"status": "Success"}
+
+
+@app.post('/api/v1/reset-password', status_code=status.HTTP_200_OK)
+def reset_password(credential: schemas.UserResetPassword, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(
+        models.User.email == credential.email).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No user found with given email.")
+    user.password = get_password_hash(credential.password)
+    db.commit()
+    return {"message": "Password reset successful!"}

@@ -1,9 +1,13 @@
+from datetime import datetime
 import os
 import smtplib
 from passlib.context import CryptContext
 from dotenv import load_dotenv
-from sqlalchemy import Sequence
+from sqlalchemy import Sequence, and_
+from sqlalchemy.orm import Session
 import secrets
+
+from . import models
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -32,8 +36,29 @@ def send_mail(to: str | Sequence[str], subject, body):
     )
     connection.close()
 
-# Generate 6 digit OTP
-
 
 def generate_otp():
     return secrets.randbelow(10**6)
+
+
+def add_otp_to_db(db: Session, user_email, otp):
+    new_otp_instance = models.PasswordResetTokens(
+        user_email=user_email, otp=otp)
+    db.add(new_otp_instance)
+    db.commit()
+    db.refresh(new_otp_instance)
+
+
+def verify_user_otp(user_email, otp, db: Session):
+    db_otp = db.query(models.PasswordResetTokens).filter(
+        and_(
+            models.PasswordResetTokens.user_email == user_email,
+            models.PasswordResetTokens.otp == otp,
+            models.PasswordResetTokens.expiry_time > datetime.utcnow()
+        )
+    ).first()
+    print(f"db_otp {db_otp}")
+    if db_otp:
+        return True
+    else:
+        return False

@@ -42,6 +42,16 @@ class UserForgotPassword(BaseModel):
     email: EmailStr
 
 
+class UserResetPassword(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserOtpVerify(BaseModel):
+    email: EmailStr
+    otp: str
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
