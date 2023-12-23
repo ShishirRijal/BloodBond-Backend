@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
 from .database import get_db
-from . import models
+from models import *
 from app.schemas import TokenData
 
 
@@ -41,8 +41,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         token_data = TokenData(email=email)
     except JWTError:
         raise credentials_exception
-    user = db.query(models.User).filter(
-        models.User.email == token_data.email).first()
+    user = db.query(User).filter(
+        User.email == token_data.email).first()
     if user is None:
         raise credentials_exception
     return user

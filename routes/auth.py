@@ -2,7 +2,8 @@ from fastapi import Depends, HTTPException, status, APIRouter
 import psycopg2
 from sqlalchemy.orm import Session
 
-from app import models, schemas
+from app import schemas
+from models import *
 from app.database import get_db
 from app.utils import get_password_hash, verify_password, send_mail, generate_otp, verify_user_otp
 from app import oauth2
@@ -18,7 +19,7 @@ router = APIRouter(
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     try:
         user.password = get_password_hash(user.password)
-        new_user = models.User(**user.model_dump())
+        new_user = User(**user.model_dump())
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
@@ -35,8 +36,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=schemas.Token)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     # check if user exists
-    db_user = db.query(models.User).filter(
-        models.User.email == user.email).first()
+    db_user = db.query(User).filter(
+        User.email == user.email).first()
     # if the user doesn't exist
     if not db_user:
         raise HTTPException(
@@ -57,8 +58,8 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
 def change_password(user: schemas.UserChangePassword, db: Session = Depends(get_db)):
     print(user)
     # check if user with provided email exists
-    db_user = db.query(models.User).filter(
-        models.User.email == user.email).first()
+    db_user = db.query(User).filter(
+        User.email == user.email).first()
     # if the user doesn't exist, raise an error
     if not db_user:
         raise HTTPException(
@@ -78,8 +79,8 @@ def change_password(user: schemas.UserChangePassword, db: Session = Depends(get_
 @router.post("/forgot-password")
 def forgot_password(user: schemas.UserForgotPassword, db: Session = Depends(get_db)):
     # check if user with provided email exists
-    db_user = db.query(models.User).filter(
-        models.User.email == user.email).first()
+    db_user = db.query(User).filter(
+        User.email == user.email).first()
     # if the user doesn't exist, raise an error
     if not db_user:
         raise HTTPException(
@@ -120,8 +121,8 @@ def verify_otp(cred: schemas.UserOtpVerify, db: Session = Depends(get_db)):
 
 @router.post('/reset-password', status_code=status.HTTP_200_OK)
 def reset_password(credential: schemas.UserResetPassword, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(
-        models.User.email == credential.email).first()
+    user = db.query(User).filter(
+        User.email == credential.email).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="No user found with given email.")

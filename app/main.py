@@ -1,19 +1,23 @@
 from fastapi import FastAPI
 
-from .import models
-from .database import engine
-import routes
+from .database import engine, Base
+from routes import *
+
+try:
+    Base.metadata.create_all(bind=engine)
+    print("Tables created successfully.")
+except Exception as e:
+    print(f"Error creating tables: {e}")
 
 
-# Create the tables in the database
-models.Base.metadata.create_all(bind=engine)
-
+# Initialize FastAPI App
 app = FastAPI()
 
 
-app.include_router(routes.auth.router)
+# Routes
+app.include_router(auth.router)
 
 
-@app.get("/")
+@app.get("/")  # Homescreen Route
 def root():
     return {"message": "Welcome to BloodBond!"}

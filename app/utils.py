@@ -7,7 +7,7 @@ from sqlalchemy import Sequence, and_
 from sqlalchemy.orm import Session
 import secrets
 
-from . import models
+from models import *
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -42,7 +42,7 @@ def generate_otp():
 
 
 def add_otp_to_db(db: Session, user_email, otp):
-    new_otp_instance = models.PasswordResetTokens(
+    new_otp_instance = PasswordResetToken(
         user_email=user_email, otp=otp)
     db.add(new_otp_instance)
     db.commit()
@@ -50,11 +50,11 @@ def add_otp_to_db(db: Session, user_email, otp):
 
 
 def verify_user_otp(user_email, otp, db: Session):
-    db_otp = db.query(models.PasswordResetTokens).filter(
+    db_otp = db.query(PasswordResetToken).filter(
         and_(
-            models.PasswordResetTokens.user_email == user_email,
-            models.PasswordResetTokens.otp == otp,
-            models.PasswordResetTokens.expiry_time > datetime.utcnow()
+            PasswordResetToken.user_email == user_email,
+            PasswordResetToken.otp == otp,
+            PasswordResetToken.expiry_time > datetime.utcnow()
         )
     ).first()
     print(f"db_otp {db_otp}")
