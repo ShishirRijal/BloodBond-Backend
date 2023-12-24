@@ -7,6 +7,7 @@ from app import schemas
 from app.database import get_db
 from app.utils import get_password_hash
 import models
+from sqlalchemy.exc import SQLAlchemyError
 
 router = APIRouter(
     prefix="/api/v1/donors",
@@ -32,13 +33,26 @@ def register_donor(donor: schemas.DonorCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
 
 
-@router.get("/")
+@router.get("/", response_model=list[schemas.DonorResponseVague])
 def get_donors(db: Session = Depends(get_db)):
     try:
-        donors = db.query(models.User).filter(
-            models.User.is_donor == True).all()
+        donors = db.query(models.Donor).all()
         return donors
     except Exception as e:
         print(f"Get donors error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
+
+
+@router.get("/{id}", response_model=schemas.DonorResponse)
+def get_donor_detail(id: int, db: Session = Depends(get_db)):
+    try:
+        donor = db.query(models.Donor).filter(models.Donor.id == id).first()
+        if donor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exists")
+        return donor
+    except SQLAlchemyError as e:
+        print("get user error: ", e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")

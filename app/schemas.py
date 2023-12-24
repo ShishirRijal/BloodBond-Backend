@@ -88,5 +88,12 @@ class DonorResponse(DonorBase):
     id: int
     created_at: datetime
 
+
+class DonorResponseVague(BaseModel):
+    first_name: str
+    last_name: str
+    blood_group: str
+    # location
+
     class Config:
         from_attributes = True
