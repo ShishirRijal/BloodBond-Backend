@@ -124,3 +124,9 @@ class HospitalResponseVague(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserAdd(BaseModel):
+    email: EmailStr
+    password: str
+    is_donor: bool

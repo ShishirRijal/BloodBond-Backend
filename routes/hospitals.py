@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app import schemas
 
 from app.database import get_db
-from app.utils import get_password_hash
+from app.utils import add_user_to_db, get_password_hash
 import models
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -23,6 +23,10 @@ def register_donor(hospital: schemas.HospitalCreate, db: Session = Depends(get_d
         db.add(new_hospital)
         db.commit()
         db.refresh(new_hospital)
+        # Adding to user table
+        user = schemas.UserAdd(
+            is_donor=False, **hospital.model_dump())
+        add_user_to_db(db, user)
         return new_hospital
     except (Exception, psycopg2.IntegrityError) as error:
         print("register hospital error: ", error)

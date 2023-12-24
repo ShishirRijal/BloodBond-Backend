@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from sqlalchemy import Sequence, and_
 from sqlalchemy.orm import Session
 import secrets
+from app import schemas
 
 from models import *
 
@@ -62,3 +63,9 @@ def verify_user_otp(user_email, otp, db: Session):
         return True
     else:
         return False
+
+
+def add_user_to_db(db: Session, user: schemas.UserAdd):
+    new_user = User(**user.model_dump())
+    db.add(new_user)
+    db.commit()

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app import schemas
 
 from app.database import get_db
-from app.utils import get_password_hash
+from app.utils import add_user_to_db, get_password_hash
 import models
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -23,12 +23,17 @@ def register_donor(donor: schemas.DonorCreate, db: Session = Depends(get_db)):
         db.add(new_donor)
         db.commit()
         db.refresh(new_donor)
+        # Adding to user table
+        user = schemas.UserAdd(
+            is_donor=True, **donor.model_dump())
+        add_user_to_db(db, user)
         return new_donor
-    except (Exception, psycopg2.IntegrityError) as error:
+    except psycopg2.IntegrityError as error:
         print("register donor error: ", error)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=f"User already exists")
-    except:
+    except Exception as e:
+        print(f"register donor error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
 
