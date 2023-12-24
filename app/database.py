@@ -11,10 +11,9 @@ load_dotenv()  # Load environment variables from .env file
 # create a PostgreSQL engine
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-try:
-    engine = create_engine(DATABASE_URL)
-except Exception as e:
-    print(f"Error creating database engine: {e}")
+
+engine = create_engine(DATABASE_URL)
+
 # create a session local class for session maker
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
