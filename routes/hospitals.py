@@ -42,3 +42,18 @@ def get_donors(db: Session = Depends(get_db)):
         print(f"Get hospitals error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
+
+
+@router.get("/{id}", response_model=schemas.HospitalResponse)
+def get_hospital_detail(id: int, db: Session = Depends(get_db)):
+    try:
+        hospital = db.query(models.Hospital).filter(
+            models.Hospital.id == id).first()
+        if hospital is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Hospital doesn't exists")
+        return hospital
+    except SQLAlchemyError as e:
+        print("get hospital error: ", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
