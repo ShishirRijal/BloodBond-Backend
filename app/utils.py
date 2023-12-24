@@ -27,10 +27,10 @@ def verify_password(plain_password, hashed_password):
 def send_mail(to: str | Sequence[str], subject, body):
     connection = smtplib.SMTP("smtp.gmail.com")
     connection.starttls()
-    connection.login(user=os.getenv("MY_EMAIL_ADDRESS"),
-                     password=os.getenv("EMAIL_APP_PASSWORD"))
+    connection.login(user=os.environ.get("MY_EMAIL_ADDRESS"),
+                     password=os.environ.get("EMAIL_APP_PASSWORD"))
     connection.sendmail(
-        from_addr=os.getenv("MY_EMAIL_ADDRESS"),
+        from_addr=os.environ.get("MY_EMAIL_ADDRESS"),
         to_addrs=to,
         msg=f"Subject:{subject}\n\n{body}"
     )

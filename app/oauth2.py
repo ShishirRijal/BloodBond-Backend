@@ -19,10 +19,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")))
+    expire = datetime.utcnow() + \
+        timedelta(minutes=int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES")))
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, os.getenv("SECRET_KEY"), algorithm=os.getenv("ALGORITHM"))
+        to_encode, os.environ.get("SECRET_KEY"), algorithm=os.environ.get("ALGORITHM"))
     return encoded_jwt
 
 
@@ -33,8 +34,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token,  os.getenv(
-            "SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
+        payload = jwt.decode(token,  os.environ.get(
+            "SECRET_KEY"), algorithms=[os.environ.get("ALGORITHM")])
         email: str = payload.get("email")
         if email is None:
             raise credentials_exception
