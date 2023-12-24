@@ -30,6 +30,6 @@ app.include_router(auth.router)
 app.include_router(donors.router)
 
 
-@app.get("/")  # Homescreen Route
+@app.get("/", tags=["Home"])  # Homescreen Route
 def root():
     return {"message": "Welcome to BloodBond!"}

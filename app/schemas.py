@@ -97,3 +97,31 @@ class DonorResponseVague(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class HospitalBase(BaseModel):
+    name: str
+    email: EmailStr
+    phone: str
+    address: str
+    is_verified: bool
+
+
+class HospitalCreate(HospitalBase):
+    password: str
+
+
+class HospitalResponse(HospitalBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class HospitalResponseVague(BaseModel):
+    name: str
+    # location
+
+    class Config:
+        from_attributes = True
