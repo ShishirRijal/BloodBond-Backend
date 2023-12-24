@@ -31,3 +31,14 @@ def register_donor(hospital: schemas.HospitalCreate, db: Session = Depends(get_d
     except:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
+
+
+@router.get("/", response_model=list[schemas.HospitalResponseVague])
+def get_donors(db: Session = Depends(get_db)):
+    try:
+        hospitals = db.query(models.Hospital).all()
+        return hospitals
+    except Exception as e:
+        print(f"Get hospitals error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
