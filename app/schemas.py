@@ -103,8 +103,7 @@ class HospitalBase(BaseModel):
     name: str
     email: EmailStr
     phone: str
-    address: str
-    is_verified: bool
+    is_verified: bool | None = False
 
 
 class HospitalCreate(HospitalBase):
