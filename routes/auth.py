@@ -56,7 +56,6 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
 
 @router.post("/change-password", status_code=status.HTTP_200_OK)
 def change_password(user: schemas.UserChangePassword, db: Session = Depends(get_db)):
-    print(user)
     # check if user with provided email exists
     db_user = db.query(User).filter(
         User.email == user.email).first()
