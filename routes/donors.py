@@ -1,4 +1,3 @@
-from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 import psycopg2
 from sqlalchemy.orm import Session
@@ -59,5 +58,28 @@ def get_donor_detail(id: int, db: Session = Depends(get_db)):
         return donor
     except SQLAlchemyError as e:
         print("get user error: ", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
+
+
+@router.get("/update-profile/{id}")
+def update_donor_profile(id: int, donor: schemas.DonorUpdate, db: Session = Depends(get_db)):
+    try:
+        # Check if donor record exists
+        existing_donor = db.query(models.Donor).get(id)
+        print(existing_donor)
+        if existing_donor is None:
+            raise
+        # Update the donor record
+        db.query(models.Donor).filter(
+            models.Donor.id == id).update(donor.model_dump())
+        db.commit()
+        return {"message": "Profile updated successfully"}
+    except HTTPException as e:
+        print("Update donor profile error: ", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Profile not found!")
+    except Exception as e:
+        print(f"Update donor profile error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")

@@ -61,3 +61,27 @@ def get_hospital_detail(id: int, db: Session = Depends(get_db)):
         print("get hospital error: ", e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
+
+
+@router.get("/update-profile/{id}")
+def update_hospital_profile(id: int, hospital: schemas.HospitalUpdate, db: Session = Depends(get_db)):
+    try:
+        # Check if hospital record exists
+        existing_hospital = db.query(models.Hospital).get(id)
+        print(existing_hospital)
+        if existing_hospital is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Profile doesn't exists")
+        # Update the hospital record
+        db.query(models.Hospital).filter(
+            models.Hospital.id == id).update(hospital.model_dump())
+        db.commit()
+        return {"message": "Profile updated successfully"}
+    except HTTPException as e:
+        print("Update hospital profile error: ", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Profile not found!")
+    except Exception as e:
+        print(f"Update hospital profile error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")

@@ -62,7 +62,6 @@ class TokenData(BaseModel):
 
 
 class DonorBase(BaseModel):
-    email: EmailStr
     first_name: str
     last_name: str
     phone: str
@@ -72,6 +71,7 @@ class DonorBase(BaseModel):
 
 
 class DonorCreate(DonorBase):
+    email: EmailStr
     password: str
 
     @validator("date_of_birth", pre=True)
@@ -86,6 +86,7 @@ class DonorCreate(DonorBase):
 
 class DonorResponse(DonorBase):
     id: int
+    email: EmailStr
     created_at: datetime
 
 
@@ -97,6 +98,24 @@ class DonorResponseVague(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class DonorUpdate(DonorBase):
+    first_name: str
+    last_name: str
+    phone: str
+    sex: str
+    date_of_birth: datetime
+    blood_group: str
+
+    @validator("date_of_birth", pre=True)
+    def parse_date_of_birth(cls, value):
+        try:
+            # Parse the input string into a datetime object
+            return datetime.strptime(value, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError(
+                "Invalid date format. Please provide the date in YYYY-MM-DD format.")
 
 
 class HospitalBase(BaseModel):
@@ -124,6 +143,11 @@ class HospitalResponseVague(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class HospitalUpdate(BaseModel):
+    name: str
+    phone: str
 
 
 class UserAdd(BaseModel):
