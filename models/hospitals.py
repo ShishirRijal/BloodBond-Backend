@@ -9,7 +9,6 @@ class Hospital(Base):
     id = Column(Integer, primary_key=True, nullable=False, index=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True, index=True)
-    password = Column(String, nullable=False)
     phone = Column(String(length=10), nullable=False, unique=True, index=True)
     # location = Column(Geography(geometry_type='POINT', srid=4326))
     is_verified = Column(Boolean, nullable=False, default=False)

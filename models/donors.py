@@ -10,7 +10,6 @@ class Donor(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True, index=True)
-    password = Column(String, nullable=False)
     phone = Column(String(length=10), nullable=False, unique=True, index=True)
     # location = Column(Geography(geometry_type='POINT', srid=4326))
 
