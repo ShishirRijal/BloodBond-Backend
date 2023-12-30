@@ -32,7 +32,7 @@ async def upload_file(file: UploadFile):
 
         # Save the image to the server
         script_path = Path(__file__).resolve()
-        image_path = script_path.parent.parent / "images" / image_name
+        image_path = script_path.parent.parent.parent / "images" / image_name
 
         image.save(image_path)
         return {"message": "Image uploaded successfully!", "image_name": image_name}
