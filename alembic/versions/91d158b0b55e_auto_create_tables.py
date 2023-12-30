@@ -1,8 +1,8 @@
-"""Recreate tables
+"""auto create tables
 
-Revision ID: f68e9d5ba0a2
-Revises: f5a7e23af643
-Create Date: 2023-12-25 15:33:22.265674
+Revision ID: 91d158b0b55e
+Revises: 
+Create Date: 2023-12-30 17:04:58.160243
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f68e9d5ba0a2'
-down_revision: Union[str, None] = 'f5a7e23af643'
+revision: str = '91d158b0b55e'
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -25,7 +25,6 @@ def upgrade() -> None:
     sa.Column('first_name', sa.String(), nullable=False),
     sa.Column('last_name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
-    sa.Column('password', sa.String(), nullable=False),
     sa.Column('phone', sa.String(length=10), nullable=False),
     sa.Column('blood_group', sa.String(), nullable=False),
     sa.Column('sex', sa.CHAR(), nullable=False),
@@ -40,7 +39,6 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
-    sa.Column('password', sa.String(), nullable=False),
     sa.Column('phone', sa.String(length=10), nullable=False),
     sa.Column('is_verified', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('NOW()'), nullable=False),
