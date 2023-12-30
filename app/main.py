@@ -25,6 +25,7 @@ app.add_middleware(
 
 
 # Routes
+app.include_router(image.router)
 app.include_router(auth.router)
 app.include_router(donors.router)
 app.include_router(hospitals.router)
