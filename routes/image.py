@@ -13,6 +13,16 @@ router = APIRouter(
 
 @router.post("/upload-image", status_code=status.HTTP_201_CREATED)
 async def upload_file(file: UploadFile):
+    return await upload_image(file)
+
+
+@router.get("/get-image/{image}", response_class=FileResponse)
+async def get_file(image: str):
+    return await get_image(image)
+
+
+# Helper functions
+async def upload_image(file: UploadFile):
     try:
         if not file:
             raise HTTPException(status_code=400, detail="No file uploaded!")
@@ -38,7 +48,7 @@ async def upload_file(file: UploadFile):
         image_path = script_path.parent.parent.parent / "images" / image_name
 
         image.save(image_path)
-        return {"message": "Image uploaded successfully!", "image_name": image_name}
+        return image_name
 
     except Exception as e:
         raise HTTPException(
@@ -46,7 +56,6 @@ async def upload_file(file: UploadFile):
         )
 
 
-@router.get("/get-image/{image}", response_class=FileResponse)
 async def get_image(image: str):
     script_path = Path(__file__).resolve()
     image_path = script_path.parent.parent.parent / "images" / image
