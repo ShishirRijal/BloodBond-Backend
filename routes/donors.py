@@ -18,8 +18,8 @@ router = APIRouter(
 def register_donor(donor: schemas.DonorCreate, db: Session = Depends(get_db)):
     try:
         donor.password = get_password_hash(donor.password)
-
-        new_donor = models.Donor(**donor.model_dump())
+        print(donor.model_dump())
+        new_donor = models.Donor(**donor.model_dump(exclude={"password"}))
         db.add(new_donor)
         db.commit()
         db.refresh(new_donor)

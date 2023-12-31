@@ -13,13 +13,15 @@ router = APIRouter(
     prefix="/api/v1/hospitals",
     tags=["Hospitals"]
 )
+# 'password' is an invalid keyword argument for Donor
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=schemas.HospitalResponse)
 def register_donor(hospital: schemas.HospitalCreate, db: Session = Depends(get_db)):
     try:
         hospital.password = get_password_hash(hospital.password)
-        new_hospital = models.Hospital(**hospital.model_dump())
+        new_hospital = models.Hospital(
+            **hospital.model_dump(exclude={"password"}))
         db.add(new_hospital)
         db.commit()
         db.refresh(new_hospital)

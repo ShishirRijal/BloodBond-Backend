@@ -143,7 +143,6 @@ class HospitalResponse(HospitalBase):
 
 class HospitalResponseVague(BaseModel):
     name: str
-    # location
 
     class Config:
         from_attributes = True
