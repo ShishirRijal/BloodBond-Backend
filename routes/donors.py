@@ -63,23 +63,21 @@ def get_donor_detail(id: int, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
 
 
-@router.get("/update-profile/{id}")
+@router.put("/update-profile/{id}")
 def update_donor_profile(id: int, donor: schemas.DonorUpdate, db: Session = Depends(get_db)):
+
+    # Check if donor record exists
+    existing_donor = db.query(models.Donor).get(id)
+    print(existing_donor)
+    if existing_donor is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found!")
+    # Update the donor record
     try:
-        # Check if donor record exists
-        existing_donor = db.query(models.Donor).get(id)
-        print(existing_donor)
-        if existing_donor is None:
-            raise
-        # Update the donor record
         db.query(models.Donor).filter(
             models.Donor.id == id).update(donor.model_dump())
         db.commit()
         return {"message": "Profile updated successfully"}
-    except HTTPException as e:
-        print("Update donor profile error: ", e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Profile not found!")
     except Exception as e:
         print(f"Update donor profile error: {e}")
         raise HTTPException(

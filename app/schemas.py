@@ -70,12 +70,6 @@ class DonorBase(BaseModel):
     blood_group: str
     latitude: float
     longitude: float
-    image: str
-
-
-class DonorCreate(DonorBase):
-    email: EmailStr
-    password: str
 
     @validator("date_of_birth", pre=True)
     def parse_date_of_birth(cls, value):
@@ -87,10 +81,17 @@ class DonorCreate(DonorBase):
                 "Invalid date format. Please provide the date in YYYY-MM-DD format.")
 
 
+class DonorCreate(DonorBase):
+    email: EmailStr
+    password: str
+    image: str
+
+
 class DonorResponse(DonorBase):
     id: int
     email: EmailStr
     created_at: datetime
+    image: str
 
 
 class DonorResponseVague(BaseModel):
@@ -99,27 +100,14 @@ class DonorResponseVague(BaseModel):
     blood_group: str
     latitude: float
     longitude: float
+    image: str
 
     class Config:
         from_attributes = True
 
 
 class DonorUpdate(DonorBase):
-    first_name: str
-    last_name: str
-    phone: str
-    sex: str
-    date_of_birth: datetime
-    blood_group: str
-
-    @validator("date_of_birth", pre=True)
-    def parse_date_of_birth(cls, value):
-        try:
-            # Parse the input string into a datetime object
-            return datetime.strptime(value, "%Y-%m-%d")
-        except ValueError:
-            raise ValueError(
-                "Invalid date format. Please provide the date in YYYY-MM-DD format.")
+    pass
 
 
 class HospitalBase(BaseModel):
