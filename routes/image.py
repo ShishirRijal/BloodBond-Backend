@@ -1,7 +1,10 @@
+import os
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, UploadFile, status
 from PIL import Image
 import uuid
+
+from fastapi.responses import FileResponse
 
 router = APIRouter(
     tags=["Image"],
@@ -41,3 +44,13 @@ async def upload_file(file: UploadFile):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error: {e}"
         )
+
+
+@router.get("/get-image/{image}", response_class=FileResponse)
+async def get_image(image: str):
+    script_path = Path(__file__).resolve()
+    image_path = script_path.parent.parent.parent / "images" / image
+    # Check if the file exists
+    if not os.path.exists(image_path):
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(image_path, media_type="image/jpeg")
