@@ -11,6 +11,7 @@ class Donor(Base):
     last_name = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True, index=True)
     phone = Column(String(length=10), nullable=False, unique=True, index=True)
+    image = Column(String, nullable=False)
     latitude = Column(Double, nullable=False)
     longitude = Column(Double, nullable=False)
     blood_group = Column(String, nullable=False)

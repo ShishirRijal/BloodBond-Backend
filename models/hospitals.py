@@ -11,6 +11,7 @@ class Hospital(Base):
     email = Column(String, nullable=False, unique=True, index=True)
     phone = Column(String(length=10), nullable=False, unique=True, index=True)
     latitude = Column(Double, nullable=False)
+    image = Column(String, nullable=False)
     longitude = Column(Double, nullable=False)
     is_verified = Column(Boolean, nullable=False, default=False)
     created_at = Column(TIMESTAMP(timezone=True),
