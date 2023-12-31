@@ -13,7 +13,6 @@ router = APIRouter(
     prefix="/api/v1/hospitals",
     tags=["Hospitals"]
 )
-# 'password' is an invalid keyword argument for Donor
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=schemas.HospitalResponse)

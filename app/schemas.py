@@ -96,7 +96,8 @@ class DonorResponseVague(BaseModel):
     first_name: str
     last_name: str
     blood_group: str
-    # location
+    latitude: float
+    longitude: float
 
     class Config:
         from_attributes = True
@@ -143,6 +144,8 @@ class HospitalResponse(HospitalBase):
 
 class HospitalResponseVague(BaseModel):
     name: str
+    latitude: float
+    longitude: float
 
     class Config:
         from_attributes = True
@@ -151,6 +154,8 @@ class HospitalResponseVague(BaseModel):
 class HospitalUpdate(BaseModel):
     name: str
     phone: str
+    latitude: float
+    longitude: float
 
 
 class UserAdd(BaseModel):
