@@ -68,6 +68,8 @@ class DonorBase(BaseModel):
     sex: str
     date_of_birth: datetime
     blood_group: str
+    latitude: float
+    longitude: float
 
 
 class DonorCreate(DonorBase):
@@ -122,6 +124,8 @@ class HospitalBase(BaseModel):
     name: str
     email: EmailStr
     phone: str
+    latitude: float
+    longitude: float
     is_verified: bool | None = False
 
 
