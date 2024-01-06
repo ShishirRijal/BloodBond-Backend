@@ -73,6 +73,8 @@ class DonorBase(BaseModel):
 
     @validator("date_of_birth", pre=True)
     def parse_date_of_birth(cls, value):
+        if isinstance(value, datetime):
+            return value  # Return the datetime object as is
         try:
             # Parse the input string into a datetime object
             return datetime.strptime(value, "%Y-%m-%d")
