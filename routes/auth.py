@@ -91,7 +91,7 @@ def forgot_password(user: schemas.UserForgotPassword, db: Session = Depends(get_
         send_mail(to=user.email,
                   subject="BloodBond Password Reset Request",
                   body=f"""
-Dear {db_user.name},
+Dear customer,
 
 You've requested to reset your BloodBond password. Here's your one-time password:
 
