@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app import schemas
 from models import *
 from app.database import get_db
-from app.utils import get_password_hash, verify_password, send_mail, generate_otp, verify_user_otp
+from app.utils import add_otp_to_db, get_password_hash, verify_password, send_mail, generate_otp, verify_user_otp
 from app import oauth2
 
 
@@ -102,6 +102,9 @@ Use this code to reset your password within the next 10 minutes. If you didn't m
 Stay secure,
 BloodBond Team                       
                 """)
+
+        # Now that mail is sent, add the otp to the database
+        add_otp_to_db(db, user.email, otp)
         return {"message": "Email sent successfully!"}
     except Exception as e:
         print(e)
