@@ -47,7 +47,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         User.email == token_data.email).first()
     if user is None:
         raise credentials_exception
-    is_donor = user.is_donor
-    if is_donor:
-        return db.query(Donor).filter(Donor.email == token_data.email).first()
-    return db.query(Hospital).filter(Hospital.email == token_data.email).first()
+    return user
+    # is_donor = user.is_donor
+    # if is_donor:
+    #     return db.query(Donor).filter(Donor.email == token_data.email).first()
+    # return db.query(Hospital).filter(Hospital.email == token_data.email).first()
