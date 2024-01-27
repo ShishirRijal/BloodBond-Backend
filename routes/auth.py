@@ -137,4 +137,4 @@ async def read_user_profile(current_user: User = Depends(oauth2.get_current_user
     """
     Get the current user's profile.
     """
-    return current_user
+    return {"role": "donor" if current_user.is_donor else "hospital", "user": current_user.donor if current_user.is_donor else current_user.hospital}
