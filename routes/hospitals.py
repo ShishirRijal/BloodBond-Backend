@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED, response_model=schemas.HospitalResponse)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 def register_donor(hospital: schemas.HospitalCreate, db: Session = Depends(get_db)):
     try:
         hospital.password = get_password_hash(hospital.password)
@@ -28,7 +28,7 @@ def register_donor(hospital: schemas.HospitalCreate, db: Session = Depends(get_d
         user = schemas.UserAdd(
             is_donor=False, **hospital.model_dump())
         add_user_to_db(db, user)
-        return new_hospital
+        return {"message": "Hospital registered successfully"}
     except (Exception, psycopg2.IntegrityError) as error:
         print("register hospital error: ", error)
         raise HTTPException(
