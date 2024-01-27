@@ -97,6 +97,7 @@ class DonorResponse(DonorBase):
 
 
 class DonorResponseVague(BaseModel):
+    id: int
     first_name: str
     last_name: str
     blood_group: str
@@ -135,6 +136,7 @@ class HospitalResponse(HospitalBase):
 
 
 class HospitalResponseVague(BaseModel):
+    id: int
     name: str
     latitude: float
     longitude: float
