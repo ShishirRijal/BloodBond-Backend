@@ -49,9 +49,8 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     # if password matches, return login successful
-
     access_token = oauth2.create_access_token(data={"email": db_user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "role": "donor" if db_user.is_donor else "hospital"}
 
 
 @router.post("/change-password", status_code=status.HTTP_200_OK)

@@ -5,26 +5,26 @@ from pydantic import BaseModel, EmailStr, validator
 from datetime import datetime
 
 
-class UserBase(BaseModel):
-    name: str
-    email: EmailStr
-    phone: str
-    address: str
-    blood_group: str
-    is_donor: bool
-    is_male: bool
+# class UserBase(BaseModel):
+#     name: str
+#     email: EmailStr
+#     phone: str
+#     address: str
+#     blood_group: str
+#     is_donor: bool
+#     is_male: bool
 
 
-class UserCreate(UserBase):
-    password: str
+# class UserCreate(UserBase):
+#     password: str
 
 
-class UserResponse(UserBase):
-    id: int
-    created_at: datetime
+# class UserResponse(UserBase):
+#     id: int
+#     created_at: datetime
 
-    class Config:
-        from_attributes = True
+#     class Config:
+#         from_attributes = True
 
 
 class UserLogin(BaseModel):
@@ -55,6 +55,7 @@ class UserOtpVerify(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str
 
 
 class TokenData(BaseModel):
