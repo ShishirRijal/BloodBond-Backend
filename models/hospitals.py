@@ -13,6 +13,7 @@ class Hospital(Base):
     latitude = Column(Double, nullable=False)
     image = Column(String, nullable=False)
     longitude = Column(Double, nullable=False)
+    city = Column(String, nullable=False)
     is_verified = Column(Boolean, nullable=False, default=False)
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable=False, server_default=text('NOW()'))

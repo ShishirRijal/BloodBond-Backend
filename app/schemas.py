@@ -70,6 +70,7 @@ class DonorBase(BaseModel):
     blood_group: str
     latitude: float
     longitude: float
+    city: str
 
     @validator("date_of_birth", pre=True)
     def parse_date_of_birth(cls, value):
@@ -94,19 +95,21 @@ class DonorResponse(DonorBase):
     email: EmailStr
     created_at: datetime
     image: str
+    last_donation_date: datetime | None
+    points: int
 
 
-class DonorResponseVague(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    blood_group: str
-    latitude: float
-    longitude: float
-    image: str
+# class DonorResponseVague(BaseModel):
+#     id: int
+#     first_name: str
+#     last_name: str
+#     blood_group: str
+#     latitude: float
+#     longitude: float
+#     image: str
 
-    class Config:
-        from_attributes = True
+#     class Config:
+#         from_attributes = True
 
 
 class DonorUpdate(DonorBase):
@@ -121,6 +124,7 @@ class HospitalBase(BaseModel):
     longitude: float
     image: str
     is_verified: bool | None = False
+    city: str
 
 
 class HospitalCreate(HospitalBase):
