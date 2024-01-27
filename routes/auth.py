@@ -131,3 +131,11 @@ def reset_password(credential: schemas.UserResetPassword, db: Session = Depends(
     user.password = get_password_hash(credential.password)
     db.commit()
     return {"message": "Password reset successful!"}
+
+
+@router.get("/profile")
+async def read_user_profile(current_user: User = Depends(oauth2.get_current_user)):
+    """
+    Get the current user's profile.
+    """
+    return current_user

@@ -34,6 +34,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        print("token: ", token)
         payload = jwt.decode(token,  os.environ.get(
             "SECRET_KEY"), algorithms=[os.environ.get("ALGORITHM")])
         email: str = payload.get("email")
@@ -46,4 +47,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         User.email == token_data.email).first()
     if user is None:
         raise credentials_exception
-    return user
+    is_donor = user.is_donor
+    if is_donor:
+        return db.query(Donor).filter(Donor.email == token_data.email).first()
+    return db.query(Hospital).filter(Hospital.email == token_data.email).first()
