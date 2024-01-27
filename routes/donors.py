@@ -38,7 +38,7 @@ def register_donor(donor: schemas.DonorCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something went wrong!")
 
 
-@router.get("/", response_model=list[schemas.DonorResponseVague])
+@router.get("/", response_model=list[schemas.DonorResponse])
 def get_donors(db: Session = Depends(get_db)):
     try:
         donors = db.query(models.Donor).all()
