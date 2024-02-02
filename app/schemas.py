@@ -185,3 +185,30 @@ class EmergencyRequestResponse(EmergencyRequestBase):
 
     class Config:
         from_attributes = True
+
+
+# ! Campaign
+
+class CampaignBase(BaseModel):
+    title: str
+    description: str
+    address: str
+    city: str
+    date: datetime
+    banner: str
+
+
+class CampaignCreate(CampaignBase):
+    pass
+
+
+class CampaignResponse(CampaignBase):
+    id: int
+    interested_donors: int
+    donated_donors: int
+    total_bags: int
+    hospital_id: int
+    hospital: HospitalResponse
+
+    class Config:
+        from_attributes = True
