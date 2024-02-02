@@ -19,5 +19,5 @@ class EmergencyRequest(Base):
     donor_id = Column(Integer, ForeignKey('donors.id'), nullable=True)
     hospital_id = Column(Integer, ForeignKey('hospitals.id'), nullable=False)
 
-    donor = relationship("Donor", back_populates="emergency_requests")
-    hospital = relationship("Hospital", back_populates="emergency_requests")
+    donor = relationship("Donor")
+    hospital = relationship("Hospital")

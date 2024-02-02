@@ -161,3 +161,27 @@ class UserAdd(BaseModel):
     email: EmailStr
     password: str
     is_donor: bool
+
+# ! Emergency Requests
+
+
+class EmergencyRequestBase(BaseModel):
+    patient_name: str
+    blood_group: str
+    medical_condition: str
+    report: str
+    requested_time: datetime
+    expiry_time: datetime
+
+
+class EmergencyRequestCreate(EmergencyRequestBase):
+    pass
+
+
+class EmergencyRequestResponse(EmergencyRequestBase):
+    id: int
+    donor: DonorResponse | None
+    hospital: HospitalResponse
+
+    class Config:
+        from_attributes = True
