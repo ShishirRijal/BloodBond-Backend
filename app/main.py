@@ -25,6 +25,7 @@ app.add_middleware(
 
 
 # Routes
+app.include_router(campaigns.router)
 app.include_router(emergency_requests.router)
 app.include_router(image.router)
 app.include_router(auth.router)
