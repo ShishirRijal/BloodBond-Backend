@@ -33,3 +33,12 @@ def create_emergency_request(request: schemas.EmergencyRequestCreate, db: Sessio
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.get("/", response_model=list[schemas.EmergencyRequestResponse])
+def get_all_emergency_requests(db: Session = Depends(get_db)):
+    try:
+        return db.query(models.EmergencyRequest).all()
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
