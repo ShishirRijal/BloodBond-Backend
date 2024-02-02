@@ -6,7 +6,7 @@ from app.database import Base
 class EmergencyRequest(Base):
     __tablename__ = 'emergency_requests'
 
-    id = Column(Integer, primary_key=True, nullable=False, index=True)
+    id = Column(Integer, primary_key=True, nullable=False)
     patient_name = Column(String, nullable=False)
     blood_group = Column(String, nullable=False)
     # required for what medical condition

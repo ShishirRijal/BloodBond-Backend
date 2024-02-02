@@ -3,3 +3,4 @@ from .users import User
 from .donors import Donor
 from .hospitals import Hospital
 from app.database import Base
+from .emergency_requests import EmergencyRequest
