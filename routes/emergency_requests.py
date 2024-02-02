@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=schemas.EmergencyRequestResponse)
+@router.post("/", response_model=schemas.EmergencyRequestResponse, status_code=status.HTTP_201_CREATED)
 def create_emergency_request(request: schemas.EmergencyRequestCreate, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
     # donors cannot create emergency requests
     if not current_user or current_user.is_donor:
@@ -35,10 +35,30 @@ def create_emergency_request(request: schemas.EmergencyRequestCreate, db: Sessio
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
 
 
-@router.get("/", response_model=list[schemas.EmergencyRequestResponse])
+@router.get("/", response_model=list[schemas.EmergencyRequestResponse], status_code=status.HTTP_200_OK)
 def get_all_emergency_requests(db: Session = Depends(get_db)):
     try:
         return db.query(models.EmergencyRequest).all()
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.put("/{id}", status_code=status.HTTP_200_OK)
+def accept_request(id: int,  db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    if not current_user or not current_user.is_donor:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    try:
+        request = db.query(models.EmergencyRequest).filter(
+            models.EmergencyRequest.id == id).first()
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
+        request.accepted = True
+        request.donor_id = current_user.id
+        db.commit()
+        return {"message": "Request accepted successfully"}
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
