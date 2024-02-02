@@ -65,3 +65,25 @@ def accept_request(id: int,  db: Session = Depends(get_db), current_user: User =
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.put("/{id}/donate", status_code=status.HTTP_200_OK)
+def confirm_donate(id: int, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    if not current_user or current_user.is_donor:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    try:
+        request = db.query(models.EmergencyRequest).filter(
+            models.EmergencyRequest.id == id).first()
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
+        if request.donated:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Request already donated")
+        request.donated = True
+        db.commit()
+        return {"message": "Donation confirmed successfully"}
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
