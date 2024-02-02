@@ -180,6 +180,8 @@ class EmergencyRequestCreate(EmergencyRequestBase):
 
 class EmergencyRequestResponse(EmergencyRequestBase):
     id: int
+    accepted: bool
+    donated: bool
     donor: DonorResponse | None
     hospital: HospitalResponse
 
