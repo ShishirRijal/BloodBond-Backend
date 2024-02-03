@@ -60,7 +60,7 @@ def accept_request(id: int,  db: Session = Depends(get_db), current_user: User =
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Request already accepted")
         request.accepted = True
-        request.donor_id = current_user.id
+        request.donor_id = current_user.donor_id
         db.commit()
         return {"message": "Request accepted successfully"}
     except SQLAlchemyError as e:
