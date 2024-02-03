@@ -24,8 +24,9 @@ def create_emergency_request(request: schemas.EmergencyRequestCreate, db: Sessio
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
     try:
+        id = current_user.donor_id if current_user.is_donor else current_user.hospital_id
         new_request = models.EmergencyRequest(
-            **request.model_dump(), hospital_id=current_user.id)
+            **request.model_dump(), hospital_id=id)
         db.add(new_request)
         db.commit()
         db.refresh(new_request)
