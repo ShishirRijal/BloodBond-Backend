@@ -33,7 +33,7 @@ router = APIRouter(
 #             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error")
 
 
-@router.post("/login", status_code=status.HTTP_200_OK, response_model=schemas.Token)
+@router.post("/login", status_code=status.HTTP_200_OK, response_model=schemas.LoginResponse)
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     # check if user exists
     db_user = db.query(User).filter(
@@ -50,7 +50,7 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     # if password matches, return login successful
     access_token = oauth2.create_access_token(data={"email": db_user.email})
-    return {"access_token": access_token, "token_type": "bearer", "role": "donor" if db_user.is_donor else "hospital"}
+    return {"access_token": access_token, "token_type": "bearer", "role": "donor" if db_user.is_donor else "hospital", "user": db_user.donor if db_user.is_donor else db_user.hospital}
 
 
 @router.post("/change-password", status_code=status.HTTP_200_OK)

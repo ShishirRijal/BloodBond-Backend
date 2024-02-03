@@ -164,6 +164,12 @@ class UserAdd(BaseModel):
     donor_id: int | None = None
     hospital_id: int | None = None
 
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    role: str
+    user: DonorResponse | HospitalResponse
 # ! Emergency Requests
 
 
