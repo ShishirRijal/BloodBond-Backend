@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=schemas.EmergencyRequestResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create_emergency_request(request: schemas.EmergencyRequestCreate, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
     # donors cannot create emergency requests
     if not current_user or current_user.is_donor:
@@ -29,7 +29,7 @@ def create_emergency_request(request: schemas.EmergencyRequestCreate, db: Sessio
         db.add(new_request)
         db.commit()
         db.refresh(new_request)
-        return new_request
+        return {"message": "Request created successfully"}
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
@@ -44,7 +44,7 @@ def get_all_emergency_requests(db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
 
 
-@router.put("/{id}", status_code=status.HTTP_200_OK)
+@router.put("/{id}/accept", status_code=status.HTTP_200_OK)
 def accept_request(id: int,  db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
     if not current_user or not current_user.is_donor:
         raise HTTPException(
