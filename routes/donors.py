@@ -25,7 +25,7 @@ def register_donor(donor: schemas.DonorCreate, db: Session = Depends(get_db)):
         db.refresh(new_donor)
         # Adding to user table
         user = schemas.UserAdd(
-            is_donor=True, **donor.model_dump())
+            is_donor=True, **donor.model_dump(), donor_id=new_donor.id)
         add_user_to_db(db, user)
         return {"message": "Donor registered successfully"}
     except psycopg2.IntegrityError as error:

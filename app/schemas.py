@@ -161,6 +161,8 @@ class UserAdd(BaseModel):
     email: EmailStr
     password: str
     is_donor: bool
+    donor_id: int | None = None
+    hospital_id: int | None = None
 
 # ! Emergency Requests
 
