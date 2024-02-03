@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=schemas.CampaignResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create_emergency_request(request: schemas.CampaignCreate, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
     # donors cannot create emergency requests
     if not current_user or current_user.is_donor:
@@ -29,7 +29,7 @@ def create_emergency_request(request: schemas.CampaignCreate, db: Session = Depe
         db.add(new_request)
         db.commit()
         db.refresh(new_request)
-        return new_request
+        return {"message": "Campaign created successfully"}
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
