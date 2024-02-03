@@ -140,14 +140,14 @@ class HospitalResponse(HospitalBase):
         from_attributes = True
 
 
-class HospitalResponseVague(BaseModel):
-    id: int
-    name: str
-    latitude: float
-    longitude: float
+# class HospitalResponseVague(BaseModel):
+#     id: int
+#     name: str
+#     latitude: float
+#     longitude: float
 
-    class Config:
-        from_attributes = True
+#     class Config:
+#         from_attributes = True
 
 
 class HospitalUpdate(BaseModel):
