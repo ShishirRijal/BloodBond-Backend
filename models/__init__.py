@@ -5,3 +5,4 @@ from .hospitals import Hospital
 from app.database import Base
 from .emergency_requests import EmergencyRequest
 from .campaigns import Campaign
+from .campaign_attendees import CampaignAttendee
