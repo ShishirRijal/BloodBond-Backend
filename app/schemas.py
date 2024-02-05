@@ -222,3 +222,20 @@ class CampaignResponse(CampaignBase):
 
     class Config:
         from_attributes = True
+
+
+class CampaignAttendeeBase(BaseModel):
+    campaign_id: int
+    donor_id: int
+
+
+class CampaignAttendeeRegister(CampaignAttendeeBase):
+    pass
+
+
+class CampaginAttendeeResponse(CampaignAttendeeBase):
+    id: int
+    donated: bool
+
+    class Config:
+        from_attributes = True
