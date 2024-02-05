@@ -239,3 +239,7 @@ class CampaginAttendeeResponse(CampaignAttendeeBase):
 
     class Config:
         from_attributes = True
+
+
+class CampaignAttendeeDonate(BaseModel):
+    donor_id: int
