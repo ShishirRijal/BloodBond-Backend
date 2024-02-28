@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import oauth2, schemas
@@ -34,9 +35,11 @@ def create_emergency_request(request: schemas.CampaignCreate, db: Session = Depe
 
 
 @router.get("/", response_model=list[schemas.CampaignResponse], status_code=status.HTTP_200_OK)
-def get_all_emergency_requests(db: Session = Depends(get_db)):
+def get_all_emergency_requests(showAll: bool = False,  db: Session = Depends(get_db)):
     try:
-        return db.query(models.Campaign).all()
+        if showAll:
+            return db.query(models.Campaign).all()
+        return db.query(models.Campaign).filter(models.Campaign.date > datetime.now()).all()
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
@@ -95,6 +98,21 @@ def donate(campaign_id: int, request: schemas.CampaignAttendeeDonate,  db: Sessi
         attendee.donated = True
         db.commit()
         return {"message": "Donation marked successfully"}
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,  detail=f"Internal Server Error: {e}")
+
+
+@router.get("/{id}", status_code=status.HTTP_200_OK)
+def get_campaign_donors(id: int, donated: bool | None = None,  db: Session = Depends(get_db)):
+    try:
+        donors = list[int]
+        if donated is not None:
+            donors = db.query(models.CampaignAttendee).where(models.CampaignAttendee.campaign_id == id).where(
+                models.CampaignAttendee.donated == donated).all()
+        donors = db.query(models.CampaignAttendee).where(
+            models.CampaignAttendee.campaign_id == id).all()
+        return {"donors": (donor.donor_id for donor in donors),  "registered_count": len(donors), "donated_count": len([donor for donor in donors if donor.donated])}
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,  detail=f"Internal Server Error: {e}")
