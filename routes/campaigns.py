@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app import oauth2, schemas
@@ -34,9 +35,11 @@ def create_emergency_request(request: schemas.CampaignCreate, db: Session = Depe
 
 
 @router.get("/", response_model=list[schemas.CampaignResponse], status_code=status.HTTP_200_OK)
-def get_all_emergency_requests(db: Session = Depends(get_db)):
+def get_all_emergency_requests(showAll: bool = False,  db: Session = Depends(get_db)):
     try:
-        return db.query(models.Campaign).all()
+        if showAll:
+            return db.query(models.Campaign).all()
+        return db.query(models.Campaign).filter(models.Campaign.date > datetime.now()).all()
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
