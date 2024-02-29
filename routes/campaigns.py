@@ -96,6 +96,11 @@ def donate(campaign_id: int, request: schemas.CampaignAttendeeDonate,  db: Sessi
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Campaign is already marked as donated to this user")
         attendee.donated = True
+        # credit points to the donor
+        donor = db.query(models.Donor).where(
+            models.Donor.id == donor_id).first()
+        donor.points += 100
+
         db.commit()
         return {"message": "Donation marked successfully"}
     except SQLAlchemyError as e:

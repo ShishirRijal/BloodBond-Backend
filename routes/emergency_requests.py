@@ -85,6 +85,10 @@ def confirm_donate(id: int, db: Session = Depends(get_db), current_user: User = 
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Request already donated")
         request.donated = True
+        # credit points to user
+        donor = db.query(models.EmergencyRequest).filter(
+            models.EmergencyRequest.id == id).first().donor
+        donor.points += 100
         db.commit()
         return {"message": "Donation confirmed successfully"}
     except SQLAlchemyError as e:
