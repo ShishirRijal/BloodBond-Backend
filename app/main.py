@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routes import *
+from routes import rewards
 
 # try:
 #     Base.metadata.create_all(bind=engine)
@@ -25,6 +26,7 @@ app.add_middleware(
 
 
 # Routes
+app.include_router(rewards.router)
 app.include_router(campaigns.router)
 app.include_router(emergency_requests.router)
 app.include_router(image.router)

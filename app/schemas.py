@@ -243,3 +243,44 @@ class CampaginAttendeeResponse(CampaignAttendeeBase):
 
 class CampaignAttendeeDonate(BaseModel):
     donor_id: int
+
+# ! Rewards
+
+
+class RewardBase(BaseModel):
+    name: str
+    description: str
+    points: int
+    total_quantity: int
+
+
+class RewardCreate(RewardBase):
+    pass
+
+
+class RewardResponse(RewardBase):
+    id: int
+    owner_id: int
+    redeemed_quantity: int
+
+    class Config:
+        from_attributes = True
+
+#! Redeem
+
+
+class RedeemBase(BaseModel):
+    reward_id: int
+    donor_id: int
+
+
+class RedeemCreate(RedeemBase):
+    pass
+
+
+class RedeemResponse(RedeemBase):
+    id: int
+    redeemed_at: datetime
+
+    class Config:
+        from_attributes = True
