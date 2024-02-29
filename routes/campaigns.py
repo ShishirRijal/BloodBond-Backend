@@ -116,3 +116,24 @@ def get_campaign_donors(id: int, donated: bool | None = None,  db: Session = Dep
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,  detail=f"Internal Server Error: {e}")
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_campaign(id: int, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    if not current_user or current_user.is_donor:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    try:
+        item_query = db.query(models.Campaign).filter(models.Campaign.id == id)
+        if not item_query.first():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found")
+        # delete all attendees
+        db.query(models.CampaignAttendee).filter(
+            models.CampaignAttendee.campaign_id == id).delete()
+        item_query.delete()
+        db.commit()
+        return {"message": "Campaign deleted successfully"}
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,  detail=f"Internal Server Error: {e}")
