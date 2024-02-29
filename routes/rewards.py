@@ -12,12 +12,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from models.users import User
 
 router = APIRouter(
-    prefix="/api/v1/rewards",
+    prefix="/api/v1",
     tags=["Rewards"]
 )
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/rewards/", status_code=status.HTTP_201_CREATED)
 def create(request: schemas.RewardCreate, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
     # donors cannot create rewards
     if not current_user or current_user.is_donor:
@@ -35,7 +35,7 @@ def create(request: schemas.RewardCreate, db: Session = Depends(get_db), current
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
 
 
-@router.get("/", status_code=status.HTTP_200_OK, response_model=list[schemas.RewardResponse])
+@router.get("/rewards/", status_code=status.HTTP_200_OK, response_model=list[schemas.RewardResponse])
 def get_rewards(showAll: bool = True,  db:  Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
     # check if user is logged in
     if not current_user:
@@ -45,7 +45,42 @@ def get_rewards(showAll: bool = True,  db:  Session = Depends(get_db), current_u
         if showAll:
             return db.query(models.Reward).all()
         else:  # show only those which aren't completely redeemded
-            return db.query(models.Reward).filter(models.Reward.remaining_quantity > 0)
+            return db.query(models.Reward).filter(models.Reward.redeemed_quantity < models.Reward.total_quantity).all()
     except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.post("/redeem/{id}", status_code=status.HTTP_200_OK)
+def redeem(id: int,  db:  Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    if not current_user or not current_user.is_donor:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    try:
+        reward = db.query(models.Reward).filter(
+            models.Reward.id == id).first()
+        if reward is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Reward not found")
+        if reward.redeemed_quantity >= reward.total_quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Reward out of stock")
+        # check if donor has enough points
+        if current_user.donor.points < reward.points:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient points")
+        # add redeem instance in redeem table
+
+        new_redeem = models.Redeem(
+            reward_id=id, donor_id=current_user.donor_id)
+        db.add(new_redeem)
+        # update donor points
+        current_user.donor.points -= reward.points
+        # update reward redeemed quantity
+        reward.redeemed_quantity += 1
+
+        db.commit()
+        return {"message": "Reward redeemed successfully"}
+    except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
