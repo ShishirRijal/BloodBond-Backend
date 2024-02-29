@@ -41,7 +41,7 @@ def get_all_emergency_requests(showAll: bool = False, db: Session = Depends(get_
     try:
         if showAll:
             return db.query(models.EmergencyRequest).all()
-        return db.query(models.EmergencyRequest).filter(models.EmergencyRequest.accepted == False).filter(models.EmergencyRequest.expiry_time > datetime.now()).all()
+        return db.query(models.EmergencyRequest).filter(models.EmergencyRequest.donated == False).filter(models.EmergencyRequest.expiry_time > datetime.now()).all()
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
