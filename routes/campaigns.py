@@ -120,14 +120,20 @@ def get_campaign_donors(id: int, donated: bool | None = None,  db: Session = Dep
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_campaign(id: int, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
-    if not current_user or current_user.is_donor:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
     try:
         item_query = db.query(models.Campaign).filter(models.Campaign.id == id)
         if not item_query.first():
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found")
+
+        # check if user is the one who created the campaign
+        is_campaign_owner = db.query(models.Campaign).filter(models.Campaign.id == id).filter(
+            models.Campaign.hospital_id == current_user.hospital_id).first()
+
+        if not is_campaign_owner:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
         # delete all attendees
         db.query(models.CampaignAttendee).filter(
             models.CampaignAttendee.campaign_id == id).delete()
