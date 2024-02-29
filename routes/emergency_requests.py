@@ -90,3 +90,28 @@ def confirm_donate(id: int, db: Session = Depends(get_db), current_user: User = 
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete(id: int, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    try:
+        request = db.query(models.EmergencyRequest).filter(
+            models.EmergencyRequest.id == id).first()
+        if request is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
+
+        # check if user is one who created the request
+        is_owner = db.query(models.EmergencyRequest).filter(
+            models.EmergencyRequest.id == id).first().hospital_id == current_user.hospital_id
+        print("is_owner", is_owner)
+        if not is_owner:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+        db.delete(request)
+        db.commit()
+        return {"message": "Request deleted successfully"}
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
