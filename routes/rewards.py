@@ -33,3 +33,19 @@ def create(request: schemas.RewardCreate, db: Session = Depends(get_db), current
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.get("/", status_code=status.HTTP_200_OK, response_model=list[schemas.RewardResponse])
+def get_rewards(showAll: bool = True,  db:  Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    # check if user is logged in
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Unathorized! Please login first")
+    try:
+        if showAll:
+            return db.query(models.Reward).all()
+        else:  # show only those which aren't completely redeemded
+            return db.query(models.Reward).filter(models.Reward.remaining_quantity > 0)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
