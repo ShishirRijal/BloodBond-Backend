@@ -117,7 +117,7 @@ def get_campaign_donors(id: int, donated: bool | None = None,  db: Session = Dep
                 models.CampaignAttendee.donated == donated).all()
         donors = db.query(models.CampaignAttendee).where(
             models.CampaignAttendee.campaign_id == id).all()
-        return {"donors": (donor.donor_id for donor in donors),  "registered_count": len(donors), "donated_count": len([donor for donor in donors if donor.donated])}
+        return {"donors": ({"id":  donor.donor.id,  "name": f"{donor.donor.first_name} { donor.donor.last_name}", "image":  donor.donor.image, "donated": donor.donated} for donor in donors),  "registered_count": len(donors), "donated_count": len([donor for donor in donors if donor.donated])}
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,  detail=f"Internal Server Error: {e}")

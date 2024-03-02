@@ -12,3 +12,5 @@ class CampaignAttendee(Base):
     donated = Column(Boolean, default=False)
     __table_args__ = (UniqueConstraint(
         'donor_id', 'campaign_id', name='_donor_campaign_uc'),)
+
+    donor = relationship("Donor")
