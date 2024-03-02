@@ -281,6 +281,7 @@ class RedeemCreate(RedeemBase):
 class RedeemResponse(RedeemBase):
     id: int
     redeemed_at: datetime
+    reward: RewardResponse
 
     class Config:
         from_attributes = True

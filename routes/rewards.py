@@ -84,3 +84,15 @@ def redeem(id: int,  db:  Session = Depends(get_db), current_user: User = Depend
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.get("/redeem", status_code=status.HTTP_200_OK, response_model=list[schemas.RedeemResponse])
+def get_my_redeems(db:  Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    if not current_user or not current_user.is_donor:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    try:
+        return db.query(models.Redeem).filter(models.Redeem.donor_id == current_user.donor_id).all()
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
