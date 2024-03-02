@@ -1,6 +1,8 @@
 from datetime import datetime
 import os
 import smtplib
+from fastapi import HTTPException, Request
+import httpx
 from passlib.context import CryptContext
 from dotenv import load_dotenv
 from sqlalchemy import Sequence, and_
@@ -69,3 +71,33 @@ def add_user_to_db(db: Session, user: schemas.UserAdd):
     new_user = User(**user.model_dump())
     db.add(new_user)
     db.commit()
+
+# send notification
+
+
+ONESIGNAL_API_URL = "https://onesignal.com/api/v1/notifications"
+ONESIGNAL_API_KEY = os.environ.get("ONESIGNAL_API_KEY")
+
+
+async def send_notification(message: str):
+    onesignal_payload = {
+        "app_id": "bdc6c13e-6cc3-457f-b009-e34972e9e3bf",
+        "included_segments": ["Total Subscriptions"],
+        "contents": {
+            "en": message,
+        }
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Basic {ONESIGNAL_API_KEY}"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(ONESIGNAL_API_URL, json=onesignal_payload, headers=headers)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code,
+                                detail="OneSignal API request failed")
+
+        return {"status": "Notification sent successfully"}
