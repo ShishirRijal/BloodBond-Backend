@@ -14,3 +14,4 @@ class CampaignAttendee(Base):
         'donor_id', 'campaign_id', name='_donor_campaign_uc'),)
 
     donor = relationship("Donor")
+    campaign = relationship("Campaign")

@@ -34,6 +34,20 @@ def create_emergency_request(request: schemas.CampaignCreate, db: Session = Depe
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
 
 
+@router.get("/my-campaigns", status_code=status.HTTP_200_OK)
+def get_my_campaigns(db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    try:
+        if not current_user.is_donor:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+        campaign_response = db.query(models.CampaignAttendee).filter(
+            models.CampaignAttendee.donor_id == current_user.donor_id).all()
+        return ({"id": campaign.campaign_id, "name": campaign.campaign.title, "image": campaign.campaign.banner, "hospital_id": campaign.campaign.hospital_id,  "hospital": campaign.campaign.hospital.name} for campaign in campaign_response)
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,  detail=f"Internal Server Error: {e}")
+
+
 @router.get("/", response_model=list[schemas.CampaignResponse], status_code=status.HTTP_200_OK)
 def get_all_emergency_requests(showAll: bool = False,  db: Session = Depends(get_db)):
     try:
