@@ -39,11 +39,13 @@ async def create_campaign(request: schemas.CampaignCreate, db: Session = Depends
 @router.get("/my-campaigns", status_code=status.HTTP_200_OK)
 def get_my_campaigns(db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
     try:
+        print("here")
         if not current_user.is_donor:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
         campaign_response = db.query(models.CampaignAttendee).filter(
-            models.CampaignAttendee.donor_id == current_user.donor_id).all()
+            models.CampaignAttendee.donor_id == current_user.donor_id).filter(models.CampaignAttendee.donated == True).all()
+
         return ({"id": campaign.campaign_id, "name": campaign.campaign.title, "image": campaign.campaign.banner, "hospital_id": campaign.campaign.hospital_id,  "hospital": campaign.campaign.hospital.name} for campaign in campaign_response)
     except SQLAlchemyError as e:
         raise HTTPException(
