@@ -285,3 +285,10 @@ class RedeemResponse(RedeemBase):
 
     class Config:
         from_attributes = True
+
+
+class HospitalRewardRedeemResponse(BaseModel):
+    id: int
+    redeemed_at: datetime
+    reward: RewardResponse
+    donor: DonorResponse

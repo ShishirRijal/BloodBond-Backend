@@ -96,3 +96,36 @@ def get_my_redeems(db:  Session = Depends(get_db), current_user: User = Depends(
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")
+
+
+@router.get("/hospital-redeem", status_code=status.HTTP_200_OK)
+def get_hospital_redeems(db:  Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    if not current_user or current_user.is_donor:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    try:
+
+        redeems = db.query(models.Redeem).join(models.Reward).filter(
+            models.Reward.owner_id == current_user.hospital_id).all()
+
+        redeemed_rewards = [
+            {
+                "reward_name": redeem.reward.name,
+                "reward_description": redeem.reward.description,
+                "reward_id": redeem.reward.id,
+                "redeem_id": redeem.id,
+                "donor": {
+                    "name": f"{redeem.donor.first_name} {redeem.donor.last_name}",
+                    "email": redeem.donor.email,
+                    "image": redeem.donor.image
+                },
+                "redeemed_at": redeem.redeemed_at
+            }
+            for redeem in redeems
+        ]
+
+        return redeemed_rewards
+
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Internal Server Error: {e}")

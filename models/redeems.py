@@ -14,3 +14,4 @@ class Redeem(Base):
                          nullable=False, server_default=text('NOW()'))
 
     reward = relationship("Reward")
+    donor = relationship("Donor")
