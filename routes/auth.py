@@ -87,24 +87,24 @@ def forgot_password(user: schemas.UserForgotPassword, db: Session = Depends(get_
     try:
         # generate otp
         otp = generate_otp()
-        send_mail(to=user.email,
-                  subject="BloodBond Password Reset Request",
-                  body=f"""
-Dear customer,
+#         send_mail(to=user.email,
+#                   subject="BloodBond Password Reset Request",
+#                   body=f"""
+# Dear customer,
 
-You've requested to reset your BloodBond password. Here's your one-time password:
+# You've requested to reset your BloodBond password. Here's your one-time password:
 
-{otp}
+# {otp}
 
-Use this code to reset your password within the next 10 minutes. If you didn't make this request, please ignore this message.
+# Use this code to reset your password within the next 10 minutes. If you didn't make this request, please ignore this message.
 
-Stay secure,
-BloodBond Team                       
-                """)
+# Stay secure,
+# BloodBond Team
+#                 """)
 
         # Now that mail is sent, add the otp to the database
         add_otp_to_db(db, user.email, otp)
-        return {"message": "Email sent successfully!"}
+        return {"otp": otp}
     except Exception as e:
         print(e)
         raise HTTPException(
