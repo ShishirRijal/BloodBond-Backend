@@ -17,8 +17,8 @@ router = APIRouter(
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_emergency_request(request: schemas.CampaignCreate, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
-    # donors cannot create emergency requests
+async def create_campaign(request: schemas.CampaignCreate, db: Session = Depends(get_db), current_user: User = Depends(oauth2.get_current_user)):
+    # donors cannot create campaigns
     if not current_user or current_user.is_donor:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
@@ -51,7 +51,7 @@ def get_my_campaigns(db: Session = Depends(get_db), current_user: User = Depends
 
 
 @router.get("/", response_model=list[schemas.CampaignResponse], status_code=status.HTTP_200_OK)
-def get_all_emergency_requests(showAll: bool = False,  db: Session = Depends(get_db)):
+def get_all_campaigns(showAll: bool = False,  db: Session = Depends(get_db)):
     try:
         if showAll:
             return db.query(models.Campaign).all()
