@@ -59,9 +59,15 @@ def accept_request(id: int,  db: Session = Depends(get_db), current_user: User =
         if request is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Request not found")
+        # check if the blood group matches
+        if request.blood_group != current_user.donor.blood_group:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Blood group does not match")
+
         if request.accepted or request.donated:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Request already accepted")
+
         request.accepted = True
         request.donor_id = current_user.donor_id
         db.commit()
